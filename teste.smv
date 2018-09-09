@@ -1,0 +1,26 @@
+MODULE main
+VAR
+    state : {s0, s1, s2};
+    ports : ports;
+    time : integer;
+ASSIGN
+    init(state) := s0;
+    init(time) := 0;
+    next(state) := case
+      state = s0 & ports.a[time] = 0 & ports.b[time] = 2 & time < 5 : s1;
+      state = s0 & ports.a[time] = 1 & ports.b[time] = 2 & time < 5 : s2;
+      state = s1 & ports.a[time] = 2 & ports.b[time] = 0 & time < 5 : s0;
+      state = s2 & ports.a[time] = 2 & ports.b[time] = 1 & time < 5 : s0;
+      TRUE                                        : state;
+    esac;
+    next(time) := case
+      time < 10 : time + 1;
+      TRUE : time;
+    esac;
+
+LTLSPEC X(state != s1);
+
+MODULE ports
+DEFINE 
+    a := [0,1,2,2];
+    b := [2,2,0,1];
